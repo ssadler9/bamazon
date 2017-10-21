@@ -7,56 +7,86 @@ var connection = mysql.createConnection({
   database : 'bamazon_db'
 });
 
-connection.connect();
-
-connection.query('SELECT * FROM products', function (error, results, fields) {
+connection.connect(function(error) {
   if (error) throw error;
-
-  // console.log('The solution is: ', results);
-  	results.forEach(function (products, product_name) {
-  		
-  			console.log('------------------');
-  			console.log(products.product_name);
-  			console.log('------------------');
-  		
-  	});
-
+  // call info function to show products
+  listItems();
 });
 
-function post() {
+
+function listItems () {
+  // display item_id, product_name, price
+  connection.query("SELECT * FROM products",
+  function(error, results) {
+    if (error) throw error;
+    for (var i = 0; i < results.length; i++) {
+      console.log("ID " + results[i].id + " | " + results[i].product_name + " | $" + results[i].price);
+    }
+    // run the function to prompt user
+    customerPrompt();
+  });
+};
+
+
+function customerPrompt() {
   inquirer.prompt([
   {
   	type: 'input',
-  	message: 'What is your product name?',
-  	name: 'item_name'
+  	message: 'What is item ID would you like to purchace?',
+  	name: 'id'
   },
   {
   	type: 'input',
-  	message: 'What is the category?',
-  	name: 'category'
+  	message: 'How many do you want?',
+  	name: 'units'
   },
-  {
-  	type: 'input',
-  	message: 'What is your starting bid?',
-  	name: 'starting_bid'
-  },
-
   	]).then(function(response){
-  		response.starting_bid = parseInt(response.starting_bid);
-  		connection.query('INSERT INTO auction SET ?', response, function (error, results, fields) {
+      var id = response.id;
+      var units = response.units;
+  		// checks the database for up-to-date data
+  		connection.query("SELECT * FROM products WHERE id = " + id + ";", response, function (error, results) {
   			if (error)
   					throw error;
+          // checks quantity in stock and stores in variable
+        var quantity = parseInt(results[0].stock_quantity);
+        // turns the price into a value
+        var price = parseInt(results[0].price);
+        var cost = units * price;
+        var remaining = quantity - units;
+        if (quantity === 0 || remaining < 0 ) {
+          noInventory();
+        } else {
+          console.log('Total cost: ' + cost);
+          updateInventory(id, units, quantity);
+        }
   		});
-  		connection.end();
   	})
   };
 
+function updateInventory (id, units, quantity) {
+  var quantity = quantity - units;
+  connection.query(
+            "UPDATE products SET ? WHERE ?",
+            [
+              {
+                stock_quantity: quantity
+              },
+              {
+                id: id
+              },
+            ],
+            function(error) {
+              if (error) throw error;
+            }
+          );
+  connectionEnd();
+};
 
 
 function noInventory () {
 	console.log('Insufficient Quantity');
 };
 
-function end () {
+function connectionEnd () {
 	connection.end();
 };
