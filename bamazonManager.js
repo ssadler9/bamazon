@@ -53,7 +53,7 @@ function managerPrompt() {
 	 			{
 	 				name: 'number',
 	 				type: 'input',
-	 				message: 'How much are we adding to inventory?'
+	 				message: 'How much are we adding to inventory?',
 	 				validate: function(value) {
 				          if (isNaN(value) === false) {
 				            return true;
@@ -71,7 +71,7 @@ function managerPrompt() {
 	 						if (error) throw error;
 						var recent = results[0].stock_quantity;
 
-	 					updateInventory();
+	 					updateInventory(update, idUpdate, recent);
 	 					});
 	 			});
 	 			
@@ -106,7 +106,7 @@ function lowStock (id, units, quantity, results) {
   });
 };
 
-function updateInventory(response, update,  idUpdate, recent) {
+function updateInventory(update, idUpdate, recent) {
 	var quantity = recent + update;
 	connection.query('UPDATE products SET ? WHERE ?',
 	[
