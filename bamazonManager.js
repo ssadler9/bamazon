@@ -2,6 +2,7 @@ var mysql = require('mysql');
 var inquirer = require('inquirer');
 // var updateItems = require('./bamazonCustomer.js');
 
+
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
@@ -14,6 +15,7 @@ connection.connect(function(error) {
   // call info function to show products
   managerPrompt();
 });
+
 
 
 function managerPrompt() {
@@ -30,15 +32,39 @@ function managerPrompt() {
       var units = response.units;
   		// checks the database for up-to-date data
   		connection.query("SELECT * FROM products WHERE id = " + id + ";", response, function (error, results) {
+	 		
 	 		if (id === 'What is in stock?') {
 	 			listItems();
 	 		} else if (id === 'Which items have 5 or less in stock?') {
 	 			lowStock();
-	 		}
+	 		} else if (id === 'Add more inventory.'){
+	 			inquirer.prompt([
+	 			{
+	 				name: 'ID',
+	 				type: 'input',
+	 				message: 'Which item (ID)?',
+	 			},
+	 			{
+	 				name: 'number',
+	 				type: 'input',
+	 				message: 'How much are we adding to inventory?'
+	 			}
+	 			]).then(function(response){
+	 				var response = parseInt(response.ID);
+					var update = parseInt(response.number);
+	 				connection.query('SELECT * FROM products',
+	 					function(error, results){
+	 						if (error) throw error;
+						var recent = parseInt(stock_quantity);
 
-  		});
-  	})
-  };
+	 				updateInventory();
+	 					});
+	 			});
+	 			
+	 		}
+  		})
+  })
+ };
 
 function listItems () {
   // display item_id, product_name, price
@@ -65,6 +91,25 @@ function lowStock (id, units, quantity, results) {
     connectionEnd();
   });
 };
+
+function updateInventory(response, update, recent) {
+	var quantity = recent + update;
+	connection.query('UPDATE products SET ? WHERE ?',
+	[
+		{
+			stock_quantity: quantity
+		},
+		{
+			id: response
+		},
+	
+		function(error){
+			if (error) throw error;
+		}
+	]);
+	connectionEnd();
+};
+
 
 function connectionEnd () {
 	connection.end();
