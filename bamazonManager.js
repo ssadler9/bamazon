@@ -43,27 +43,41 @@ function managerPrompt() {
 	 				name: 'ID',
 	 				type: 'input',
 	 				message: 'Which item (ID)?',
+				    validate: function(value) {
+				          if (isNaN(value) === false) {
+				            return true;
+				          }
+				          return false;
+				        }
 	 			},
 	 			{
 	 				name: 'number',
 	 				type: 'input',
 	 				message: 'How much are we adding to inventory?'
+	 				validate: function(value) {
+				          if (isNaN(value) === false) {
+				            return true;
+				          }
+				          return false;
+				        }
 	 			}
 	 			]).then(function(response){
-	 				var response = parseInt(response.ID);
+	 				var idUpdate = parseInt(response.ID);
+	 				console.log(idUpdate);
 					var update = parseInt(response.number);
-	 				connection.query('SELECT * FROM products',
-	 					function(error, results){
+	 				connection.query('SELECT * FROM products WHERE id = ' + idUpdate + ';', response,
+	 					function(error, results)
+	 					{
 	 						if (error) throw error;
-						var recent = parseInt(stock_quantity);
+						var recent = results[0].stock_quantity;
 
-	 				updateInventory();
+	 					updateInventory();
 	 					});
 	 			});
 	 			
 	 		}
   		})
-  })
+  	})
  };
 
 function listItems () {
@@ -92,7 +106,7 @@ function lowStock (id, units, quantity, results) {
   });
 };
 
-function updateInventory(response, update, recent) {
+function updateInventory(response, update,  idUpdate, recent) {
 	var quantity = recent + update;
 	connection.query('UPDATE products SET ? WHERE ?',
 	[
@@ -100,7 +114,7 @@ function updateInventory(response, update, recent) {
 			stock_quantity: quantity
 		},
 		{
-			id: response
+			id: idUpdate
 		},
 	
 		function(error){
