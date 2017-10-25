@@ -68,8 +68,9 @@ function managerPrompt() {
 	 						if (error) throw error;
 						var recent = results[0].stock_quantity;
 
-	 					updateInventory(update, idUpdate, recent);
+	 					
 	 					});
+	 				updateInventory(update, idUpdate, recent);
 	 			});
 	 			
 	 		} else if (id === 'New products have arrived!') {
@@ -111,13 +112,13 @@ function managerPrompt() {
 	 				var newDepartment = response.department;
 	 				var newPrice = parseInt(response.price);
 					var newInventory = parseInt(response.inventory);
-	 				connection.query('INSERT INTO products SET ?', response,
+					console.log(newProduct, newDepartment, newPrice, newInventory);
+	 				connection.query('INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES (?, ?, ?, ?);', [newProduct, newDepartment, newPrice, newInventory],
 	 					function(error, results)
 	 					{
 	 						if (error) throw error;
-					
-	 					newProducts(newProduct, newDepartment, newPrice, newInventory);
 	 					});
+	 				connectionEnd();
 	 			});
 	 		}
   		})
@@ -168,19 +169,20 @@ function updateInventory(update, idUpdate, recent) {
 	connectionEnd();
 };
 
-function newProducts(newProduct, newDepartment, newPrice, newInventory) {
-	connection.query('INSERT INTO products SET ?',
-	{
-		product_name: newProduct,
-		department_name: newDepartment,
-		price: newPrice,
-		stock_quantity: newInventory
-	},
-	function(error){
-		if (error) throw error;
-	}
-	);
-}
+// function newProducts(newProduct, newDepartment, newPrice, newInventory) {
+// 	connection.query('INSERT INTO products VALUE (product_name, department_name, price, stock_quantity)',
+// 	{
+// 		product_name: newProduct,
+// 		department_name: newDepartment,
+// 		price: newPrice,
+// 		stock_quantity: newInventory
+// 	},
+// 	function(error){
+// 		if (error) throw error;
+// 	}
+// 	);
+// 	connectionEnd();
+// }
 
 
 function connectionEnd () {
