@@ -1,7 +1,5 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
-// var updateItems = require('./bamazonCustomer.js');
-
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -63,7 +61,6 @@ function managerPrompt() {
 	 			}
 	 			]).then(function(response){
 	 				var idUpdate = parseInt(response.ID);
-	 				console.log(idUpdate);
 					var update = parseInt(response.number);
 	 				connection.query('SELECT * FROM products WHERE id = ' + idUpdate + ';', response,
 	 					function(error, results)
@@ -75,6 +72,53 @@ function managerPrompt() {
 	 					});
 	 			});
 	 			
+	 		} else if (id === 'New products have arrived!') {
+	 				 	inquirer.prompt([
+	 			{
+	 				name: 'product',
+	 				type: 'input',
+	 				message: 'What is the new product?'
+	 			},
+	 			{
+	 				name: 'department',
+	 				type: 'input',
+	 				message: 'What department?'
+	 			},
+	 			{
+	 				name: 'price',
+	 				type: 'input',
+	 				message: 'How much does it cost?',
+	 				validate: function(value) {
+				          if (isNaN(value) === false) {
+				            return true;
+				          }
+				          return false;
+				        }
+	 			},
+	 			{
+	 				name: 'inventory',
+	 				type: 'input',
+	 				message: 'How much are we adding to inventory?',
+	 				validate: function(value) {
+				          if (isNaN(value) === false) {
+				            return true;
+				          }
+				          return false;
+				        }
+	 			}
+	 			]).then(function(response){
+	 				var newProduct = response.product;
+	 				var newDepartment = response.department;
+	 				var newPrice = parseInt(response.price);
+					var newInventory = parseInt(response.inventory);
+	 				connection.query('INSERT INTO products SET ?', response,
+	 					function(error, results)
+	 					{
+	 						if (error) throw error;
+					
+	 					newProducts(newProduct, newDepartment, newPrice, newInventory);
+	 					});
+	 			});
 	 		}
   		})
   	})
@@ -123,6 +167,20 @@ function updateInventory(update, idUpdate, recent) {
 	]);
 	connectionEnd();
 };
+
+function newProducts(newProduct, newDepartment, newPrice, newInventory) {
+	connection.query('INSERT INTO products SET ?',
+	{
+		product_name: newProduct,
+		department_name: newDepartment,
+		price: newPrice,
+		stock_quantity: newInventory
+	},
+	function(error){
+		if (error) throw error;
+	}
+	);
+}
 
 
 function connectionEnd () {
