@@ -1,1 +1,18 @@
 # bamazon
+
+![GitHub Logo](/assets/images/bamazonCustomer_open.png)
+Format: ![Alt Text](url)
+![GitHub Logo](/assets/images/bamazonCustomer_purchase.png)
+Format: ![Alt Text](url)
+![GitHub Logo](/assets/images/bamazonManager_adding_new_product.png)
+Format: ![Alt Text](url)
+![GitHub Logo](/assets/images/bamazonManager_in_stock.png)
+Format: ![Alt Text](url)
+![GitHub Logo](/assets/images/bamazonManager_menu.png)
+Format: ![Alt Text](url)
+![GitHub Logo](/assets/images/bamazonManager_open.png)
+Format: ![Alt Text](url)
+![GitHub Logo](/assets/images/bamazonManager_menu.png)
+Format: ![Alt Text](url)
+![GitHub Logo](/assets/images/bamazonManager_update_stock.png)
+Format: ![Alt Text](url)
